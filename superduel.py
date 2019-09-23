@@ -1,3 +1,4 @@
+import random
 
 class Ability:
     def __init__(self, name, max_damage):
@@ -5,7 +6,14 @@ class Ability:
         self.max_damage = max_damage
 
     def attack(self):
-        print('attack')
+        damage_done = random.randint(0, self.max_damage)
+        return damage_done
+
+if __name__ == "__main__":
+    ability = Ability("Debugging Ability", 20)
+    print(ability.name)
+    print(ability.attack())
+
 
 class Armor:
     def __init__(self, name, max_block):
@@ -20,7 +28,7 @@ class Hero:
         self.name = name
         self.starting_health = starting_health
 
-    def add_ability(ability):
+    def add_ability(self, ability):
         print('ability')
 
     def attack(self):
@@ -32,7 +40,12 @@ class Hero:
     def take_damage(self, damage):
         self.damage = damage
 
-    def is_alive():
+    def is_alive(self):
+        pass
 
     def fight(self, opponent):
+        self.opponent = opponent
+        print(self.name + " fights " + opponent)
+
+
         
