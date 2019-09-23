@@ -5,3 +5,9 @@ class Dog:
 
     def bark(self):
         print("Woof!")
+
+    def sit(self, name):
+        print(name + " sits!")
+
+    def roll_over(self, name):
+        print(name + " rolls over!")
