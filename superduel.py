@@ -9,12 +9,6 @@ class Ability:
         damage_done = random.randint(0, self.max_damage)
         return damage_done
 
-if __name__ == "__main__":
-    ability = Ability("Debugging Ability", 20)
-    print(ability.name)
-    print(ability.attack())
-
-
 class Armor:
     def __init__(self, name, max_block):
         self.name = name
@@ -28,17 +22,20 @@ class Hero:
     def __init__(self, name, starting_health=100):
         self.abilities = []
         self.armor = []
-        self.name = ""
         self.starting_health = starting_health
         self.current_health = 100
         self.name = name
-        self.starting_health = starting_health
 
     def add_ability(self, ability):
         self.abilities.append(ability)
 
     def attack(self):
-        print('attack')
+        total_damage = 0
+        add_to_stack = 0
+        for ability in self.abilities:
+            add_to_stack = Ability.attack(ability)
+            total_damage += add_to_stack
+        return total_damage
     
     def defend(self, incoming_damage):
         self.incoming_damage = incoming_damage
@@ -56,9 +53,9 @@ class Hero:
 
 if __name__ == "__main__":
     ability = Ability("Test Beam", 50)
+    another_ability = Ability("Kamehameha", 120)
     hero = Hero("Goku", 200)
     hero.add_ability(ability)
-    print(hero.abilities)
+    hero.add_ability(another_ability)
+    print(hero.attack())
 
-
-        
