@@ -18,6 +18,31 @@ class Armor:
         damage_blocked = random.randint(0, self.max_block)
         return damage_blocked
 
+class Weapon(Ability):
+    def attack(self):
+        half_dmg = self.max_damage // 2
+        return random.randint(half_dmg, self.max_damage)
+
+class Team:
+    def __init__(self, name):
+        self.name = []
+        self.heroes = []
+
+    def add_hero(self, hero): 
+        self.heroes.append(hero)
+
+    def remove_hero(self, name):
+        for hero in self.heroes:
+            if hero.name == name:
+                self.heroes.remove(hero)
+                break
+            else:
+                return 0
+
+    def view_all_heroes(self):
+        for hero in self.heroes:
+            print(hero.name)
+
 class Hero:
     def __init__(self, name, starting_health=100):
         self.abilities = []
@@ -25,6 +50,8 @@ class Hero:
         self.starting_health = starting_health
         self.current_health = 100
         self.name = name
+        self.kills = 0
+        self.deaths = 0
 
     def add_ability(self, ability):
         self.abilities.append(ability)
@@ -54,6 +81,12 @@ class Hero:
     def is_alive(self):
         return self.current_health > 0
 
+    def add_kills(self, kill_count):
+        self.kills += kill_count
+
+    def add_deaths(self, num_deaths):
+        self.deaths += num_deaths
+
     def fight(self, opponent):
         while True:
             if self.is_alive():
@@ -61,7 +94,9 @@ class Hero:
                 opponent.take_damage(self_damage)
             else:
                 print(
-                    f'{opponent.name} knocked out {self.name}!')
+                    f'{opponent.name} knocked out {self.name}!')   
+                self.add_deaths(1)
+                opponent.add_kills(1)
                 break
 
             if opponent.is_alive():
@@ -69,6 +104,8 @@ class Hero:
                 self.take_damage(enemy_damage)
             else:
                 print(f'{self.name} knocked out {opponent.name}!')
+                self.add_kills(1)
+
                 break
 
 if __name__ == "__main__":
