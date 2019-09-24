@@ -29,19 +29,27 @@ class Hero:
     def add_ability(self, ability):
         self.abilities.append(ability)
 
+    def add_armor(self, armor):
+        self.armor.append(armor)
+
     def attack(self):
         total_damage = 0
-        add_to_stack = 0
         for ability in self.abilities:
             add_to_stack = Ability.attack(ability)
             total_damage += add_to_stack
         return total_damage
     
-    def defend(self, incoming_damage):
-        self.incoming_damage = incoming_damage
+    def defend(self, damage_amt = 0):
+        total_blocked = 0 
+        for armor in self.armor:
+            add_to_block = int(armor.block())
+            total_blocked += add_to_block
+        return abs(damage_amt - total_blocked)
 
     def take_damage(self, damage):
-        self.damage = damage
+        current_hp = self.current_health
+        damage_received = self.defend(damage)
+        self.current_health = current_hp - damage_received
 
     def is_alive(self):
         pass
@@ -52,10 +60,10 @@ class Hero:
         
 
 if __name__ == "__main__":
-    ability = Ability("Test Beam", 50)
     another_ability = Ability("Kamehameha", 120)
     hero = Hero("Goku", 200)
-    hero.add_ability(ability)
-    hero.add_ability(another_ability)
-    print(hero.attack())
+    shield = Armor("Shield", 50)
+    hero.add_armor(shield)
+    hero.take_damage(60)
+    print(hero.current_health)
 
