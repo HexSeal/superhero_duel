@@ -31,12 +31,11 @@ class Hero:
         self.name = ""
         self.starting_health = starting_health
         self.current_health = 100
-
         self.name = name
         self.starting_health = starting_health
 
     def add_ability(self, ability):
-        print('ability')
+        self.abilities.append(ability)
 
     def attack(self):
         print('attack')
@@ -53,12 +52,13 @@ class Hero:
     def fight(self, opponent):
         self.opponent = opponent
         print(self.name + " fights " + opponent)
-
+        
 
 if __name__ == "__main__":
-    my_hero = Hero("Rain", 200)
-    print(my_hero.name)
-    print(my_hero.current_health)
+    ability = Ability("Test Beam", 50)
+    hero = Hero("Goku", 200)
+    hero.add_ability(ability)
+    print(hero.abilities)
 
 
         
