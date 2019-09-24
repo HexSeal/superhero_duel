@@ -52,18 +52,45 @@ class Hero:
         self.current_health = current_hp - damage_received
 
     def is_alive(self):
-        pass
+        return self.current_health > 0
 
     def fight(self, opponent):
-        self.opponent = opponent
-        print(self.name + " fights " + opponent)
-        
+        while True:
+            if self.is_alive():
+                self_damage = self.attack()
+                opponent.take_damage(self_damage)
+            else:
+                print(
+                    f'{opponent.name} knocked out {self.name}!')
+                break
+
+            if opponent.is_alive():
+                enemy_damage = opponent.attack()
+                self.take_damage(enemy_damage)
+            else:
+                print(f'{self.name} knocked out {opponent.name}!')
+                break
 
 if __name__ == "__main__":
     another_ability = Ability("Kamehameha", 120)
-    hero = Hero("Goku", 200)
-    shield = Armor("Shield", 50)
-    hero.add_armor(shield)
-    hero.take_damage(60)
-    print(hero.current_health)
+    hero = Hero("Goku")
+    hero.take_damage(50)
+    print(hero.is_alive())
+    hero.take_damage(15000)
+    print(hero.is_alive())
 
+if __name__ == "__main__":
+    # If you run this file from the terminal
+    # this block is executed.
+
+    hero1 = Hero("Wonder Woman")
+    hero2 = Hero("Dumbledore")
+    ability1 = Ability("Super Speed", 300)
+    ability2 = Ability("Super Eyes", 130)
+    ability3 = Ability("Wizard Wand", 80)
+    ability4 = Ability("Wizard Beard", 20)
+    hero1.add_ability(ability1)
+    hero1.add_ability(ability2)
+    hero2.add_ability(ability3)
+    hero2.add_ability(ability4)
+    hero1.fight(hero2)
