@@ -43,6 +43,25 @@ class Team:
         for hero in self.heroes:
             print(hero.name)
 
+    def attack(self, other_team):
+        ''' battle each team against each other. '''
+        while len(self.heroes) > 0 and len(other_team.heroes) > 0:
+            Hero.fight(random.choice(self.heroes), random.choice(other_team.heroes))
+
+    def revive_heroes(self, starting_health=100):
+        ''' Resets a hero back to starting health'''
+        for hero in self.heroes:
+            hero.current_health = starting_health
+
+    def stats(self):
+        for hero in self.heroes:
+            print(f'{hero.name} K/D ratio: ', (hero.kills)/(hero.deaths))
+
+            print('Survivors: ')
+            if hero.is_alive():
+                print(hero.name, self.name)
+                
+
 class Hero:
     def __init__(self, name, starting_health=100):
         self.abilities = []
@@ -66,12 +85,14 @@ class Hero:
             total_damage += add_to_stack
         return total_damage
     
+
     def defend(self, damage_amt = 0):
+        '''I got damage_amt = 0 from Ben Lafferty. It's supposed to fix the weird pytest errors but it doesn't really'''
         total_blocked = 0 
         for armor in self.armor:
             add_to_block = int(armor.block())
             total_blocked += add_to_block
-        return abs(damage_amt - total_blocked)
+        return total_blocked + damage_amt
 
     def take_damage(self, damage):
         current_hp = self.current_health
@@ -86,6 +107,10 @@ class Hero:
 
     def add_deaths(self, num_deaths):
         self.deaths += num_deaths
+
+    def add_weapon(self, weapon):
+        self.abilities.append(weapon)
+ 
 
     def fight(self, opponent):
         while True:
@@ -108,26 +133,99 @@ class Hero:
 
                 break
 
-if __name__ == "__main__":
-    another_ability = Ability("Kamehameha", 120)
-    hero = Hero("Goku")
-    hero.take_damage(50)
-    print(hero.is_alive())
-    hero.take_damage(15000)
-    print(hero.is_alive())
+class Arena:
+    def __init__(self):
+        print('\nWelcome to the Arena.\n')
+        t1_name = input('What do you want the first team to be called? ')
+        self.team_one = Team(t1_name)
+        t2_name = input('What do you want the second team to be called? ')
+        self.team_two = Team(t2_name)
+
+    def create_ability(self):
+        ability_name = input("Ability name: ")
+        max_damage = input("Max damage: ")
+        return Ability(ability_name, max_damage)
+
+    def create_weapon(self):
+        weapon_name = input("Weapon name: ")
+        max_damage = input("Max weapon damage: ")
+        return Weapon(weapon_name, max_damage)
+
+    def create_armor(self):
+        armor_name = input("Armor name: ")
+        armor_block = input("Max armor block: ")
+        return Armor(armor_name, armor_block)
+
+    def create_hero(self):
+        hero_name = input('Choose a name for your hero: ')
+        health = input('How about some hp? Default is 100: ')
+        hero = Hero(hero_name, health)
+
+        add_abilities = input('\nDoes your hero have any abilities? y/n ')
+        if 'y' in add_abilities:
+            while True:
+                ability = self.create_ability()
+                hero.add_ability(ability)
+
+                more_abilities = input('Want to add another ability? y/n ')
+                if 'y' not in more_abilities:
+                    break
+    
+        add_weapons = input('\nDoes your hero have any weapons? y/n ')
+        if 'y' in add_weapons:
+            while True:
+                ability = self.create_weapon()
+                hero.add_ability(ability)
+
+                more_weapons = input('Want to add another weapon? y/n ')
+                if 'y' not in more_weapons:
+                    break
+
+        add_armor = input('\nDoes your hero have any armor? y/n ')
+        if 'y' in add_armor:
+            while True:
+                ability = self.create_armor()
+                hero.add_ability(Armor)
+
+                more_armor = input('Want to add more armor? y/n ')
+                if 'y' not in more_armor:
+                    break
+        return hero
+                
+    def build_team_one(self):
+        t1_num = input('How many hero(es) do you want on team 1? ')
+        if t1_num.isalnum():
+            for _ in t1_num:
+                hero = self.create_hero()
+                self.team_one.add_hero(hero)
+
+    def build_team_two(self):
+        t2_num = input('How many hero(es) do you want on team 2? ')
+        if t2_num.isalnum():
+            for _ in t2_num:
+                hero = self.create_hero()
+                self.team_two.add_hero(hero)
+
+    def team_battle(self):
+        ''' Puts team one against team two '''
+        Team.attack(self.team_one, self.team_two)
+
+    def show_stats(self):
+        self.team_one.stats()
+        self.team_two.stats()
+        
+        for hero in self.team_one.heroes:
+            if hero.is_alive():
+                print('Team One is Victorious!')
+                break
+            else:
+                print('Team Two is Victorious!')
+                break
 
 if __name__ == "__main__":
-    # If you run this file from the terminal
-    # this block is executed.
-
-    hero1 = Hero("Wonder Woman")
-    hero2 = Hero("Dumbledore")
-    ability1 = Ability("Super Speed", 300)
-    ability2 = Ability("Super Eyes", 130)
-    ability3 = Ability("Wizard Wand", 80)
-    ability4 = Ability("Wizard Beard", 20)
-    hero1.add_ability(ability1)
-    hero1.add_ability(ability2)
-    hero2.add_ability(ability3)
-    hero2.add_ability(ability4)
-    hero1.fight(hero2)
+    arena = Arena()
+    arena.build_team_one()
+    arena.build_team_two()
+    arena.team_battle()
+    arena.show_stats()
+    
