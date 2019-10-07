@@ -23,18 +23,30 @@ class Weapon(Ability):
         half_dmg = self.max_damage // 2
         return random.randint(half_dmg, int(self.max_damage))
 
+class Relic(Armor):
+    def block(self, opponent):
+        if opponent.activate_relic == True:
+            damage_blocked = random.randint(0, int(self.max_block))
+        else:
+            damage_blocked = 0
+
+        return damage_blocked
+
 class Hero:
     def __init__(self, name, starting_health=100):
         self.abilities = []
         self.armor = []
+        self.relics = []
         self.starting_health = starting_health
         self.current_health = 100
         self.name = name
         self.kills = 0
         self.deaths = 0
+        self.activate_relic = False
 
     def add_ability(self, ability):
         self.abilities.append(ability)
+        self.activate_relic = True
 
     def add_armor(self, armor):
         self.armor.append(armor)
@@ -46,17 +58,23 @@ class Hero:
             total_damage += add_to_stack
         return total_damage
     
-    def defend(self, damage_amt = 0):
+    def defend(self):
         '''I got damage_amt = 0 from Ben Lafferty. It's supposed to fix the weird pytest errors but it doesn't really'''
         total_blocked = 0 
+        total_relic = 0
         for armor in self.armor:
             add_to_block = armor.block()
             total_blocked += add_to_block
-        return damage_amt - total_blocked
+
+        if self.activate_relic == True:
+            for relic in self.relics:
+                add_to_relic = relic.block()
+                total_relic += add_to_relic
+        return total_blocked + total_relic
 
     def take_damage(self, damage):
         current_hp = self.current_health
-        damage_received = self.defend(damage)
+        damage_received = self.defend()
         self.current_health = current_hp - damage_received
 
     def is_alive(self):
@@ -73,10 +91,16 @@ class Hero:
     def add_weapon(self, weapon):
         self.abilities.append(weapon)
 
+    def add_relic(self, relic):
+        self.relics.append(relic)
+
     def fight(self, opponent):
         while self.is_alive() and opponent.is_alive():
             self_damage = self.attack()
             enemy_damage = opponent.attack()
+
+        if opponent.abilities != 0:
+            opponent.activate_relic = True
 
             self.take_damage(enemy_damage)
             opponent.take_damage(self_damage)
@@ -171,19 +195,37 @@ class Arena:
         self.team_two = Team(t2_name)
 
     def create_ability(self):
+        self.activate_relic = True
         ability_name = input("Ability name: ")
         max_damage = input("Max damage: ")
+        if max_damage > 100:
+            max_damage = input("That's hardly a fair number. Please keep it below 100: ")
+
         return Ability(ability_name, max_damage)
 
     def create_weapon(self):
         weapon_name = input("Weapon name: ")
         max_damage = input("Max weapon damage: ")
+        if max_damage > 100:
+            max_damage = input("That's hardly a fair number. Please keep it below 100: ")
+        
         return Weapon(weapon_name, max_damage)
 
     def create_armor(self):
         armor_name = input("Armor name: ")
         armor_block = input("Max armor block: ")
+        if armor_block > 100:
+            armor_block = input("That's hardly a fair number. Please keep it below 100: ")
+
         return Armor(armor_name, armor_block)
+
+    def create_relic(self):
+        relic_name = input("Relic name: ")
+        relic_block = input("Max relic block: ")
+        if relic_block > 100:
+            relic_block = input("That's hardly a fair number. Please keep it below 100: ")
+        
+        return Relic(relic_name, relic_block)
 
     def create_hero(self):
         hero_name = input('Choose a name for your hero: ')
@@ -218,6 +260,16 @@ class Arena:
 
                 more_armor = input('Want to add more armor? y/n \n')
                 if 'y' not in more_armor:
+                    break
+
+        add_relic = input('\nDoes your hero have any relics(Only blocks against abilities)? y/n ')
+        if 'y' in add_relic:
+            while True:
+                relic = self.create_relic()
+                hero.add_relic(relic)
+
+                more_relics = input('Want to add more relics? y/n \n')
+                if 'y' not in more_relics:
                     break
         return hero
                 

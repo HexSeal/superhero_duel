@@ -234,8 +234,8 @@ def test_hero_default_health():
 
 
 def test_hero_init_new_health():
-    hero = superduel.Hero("Jodie Foster", 600)
-    assert hero.current_health == 600
+    hero = superduel.Hero("Jodie Foster", 100)
+    assert hero.current_health == 100
 
 
 def test_hero_start_health():
@@ -310,7 +310,7 @@ def test_hero_defense_standard_deviation():
 def test_dead_hero_defense():
     hero = superduel.Hero("Vlaad", 0)
     garlic = superduel.Armor("Garlic", 30000)
-    hero.add_ability(garlic)
+    hero.add_armor(garlic)
     assert hero.defend() == 0
 
 
